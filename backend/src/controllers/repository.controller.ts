@@ -1,7 +1,10 @@
 import type { Request, Response } from "express";
 import githubService from "../services/github.service.js";
 import repositoryProcessor from "../services/repository.processor.js";
-import technologyAnalyzer from "../services/technology-analyzer.service";
+import technologyAnalyzer from "../services/technology-analyzer.service.js";
+import repositorySummaryService from "../services/repository-summary.service.js";
+import repositoryAIService from "../services/repository-ai.service.js";
+import repositoryIndexService from "../services/repository-index.service.js";
 
 export const analyzeRepository = async (
   req: Request,
@@ -22,17 +25,35 @@ export const analyzeRepository = async (
     const snapshot =
       await repositoryProcessor.processRepository(repoUrl);
 
+    const repositoryIndex =
+      await repositoryIndexService.build(
+        snapshot.repositoryPath
+      );
+
     const analysis =
       await technologyAnalyzer.analyze(
         snapshot.repositoryPath
       );
 
+    const importantFiles = await repositorySummaryService.collect(
+        snapshot.repositoryPath
+      );
+
+    const repositorySummary = await repositoryAIService.summarize(
+        importantFiles
+      );
+
     res.status(200).json({
       success: true,
       data: {
-        repository,
+        repository: {
+          ...repository,
+          path: snapshot.repositoryPath,
+        },
         structure: snapshot.structure,
         analysis,
+        summary: repositorySummary,
+        index: repositoryIndex,
       },
     });
   } catch (error) {

@@ -18,7 +18,7 @@ export interface RepositoryStructure {
   tree: FileNode[];
   statistics: RepositoryStatistics;
 }
-
+  
 export interface RepositorySnapshot {
   repositoryPath: string;
   structure: RepositoryStructure;

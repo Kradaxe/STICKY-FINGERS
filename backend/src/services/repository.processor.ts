@@ -2,10 +2,11 @@ import { simpleGit } from "simple-git";
 import path from "path";
 import fs from "fs/promises";
 
-import type{
-  FileNode,
+import type {
   RepositoryStructure,
   RepositoryStatistics,
+  FileNode,
+  RepositorySnapshot,
 } from "../types/file-tree.types.js";
 
 import {
@@ -27,7 +28,7 @@ class RepositoryProcessor {
    */
     public async processRepository(
       repoUrl: string
-    ): Promise<RepositoryStructure> {
+    ): Promise<RepositorySnapshot> {
       const repositoryPath = await this.cloneRepository(repoUrl);
 
       const structure =

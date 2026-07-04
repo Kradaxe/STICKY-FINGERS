@@ -20,28 +20,37 @@ class TechnologyAnalyzer {
       tools: [],
     };
 
-    const packageJson = await this.readPackageJson(repositoryPath);
+    const packageJsons = await this.readPackageJsons(repositoryPath);
 
-    if (!packageJson) {
+    if (packageJsons.length === 0) {
       return analysis;
     }
 
-    this.analyzeDependencies(packageJson, analysis);
+    for (const packageJson of packageJsons) {
+      this.analyzeDependencies(packageJson, analysis);
+    }
 
     return analysis;
   }
 
-  private async readPackageJson(repositoryPath: string) {
+private async readPackageJsons(repositoryPath: string) {
+  const packageFiles =
+    await this.findPackageJsonFiles(repositoryPath);
+
+  const packages = [];
+
+  for (const file of packageFiles) {
     try {
-      const packageJsonPath = path.join(repositoryPath, "package.json");
+      const content = await fs.readFile(file, "utf-8");
 
-      const file = await fs.readFile(packageJsonPath, "utf-8");
-
-      return JSON.parse(file);
+      packages.push(JSON.parse(content));
     } catch {
-      return null;
+      continue;
     }
   }
+
+  return packages;
+}
 
   private analyzeDependencies(
     packageJson: PackageJson,
@@ -113,6 +122,34 @@ class TechnologyAnalyzer {
       }
     }
   }
+
+  private async findPackageJsonFiles(
+  directory: string
+): Promise<string[]> {
+  const entries = await fs.readdir(directory, {
+    withFileTypes: true,
+  });
+
+  const packageFiles: string[] = [];
+
+  for (const entry of entries) {
+    if (entry.name === ".git" || entry.name === "node_modules") {
+      continue;
+    }
+
+    const fullPath = path.join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      packageFiles.push(
+        ...(await this.findPackageJsonFiles(fullPath))
+      );
+    } else if (entry.name === "package.json") {
+      packageFiles.push(fullPath);
+    }
+  }
+
+  return packageFiles;
+}
 }
 
 export default new TechnologyAnalyzer();
