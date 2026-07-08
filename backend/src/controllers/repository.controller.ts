@@ -5,6 +5,7 @@ import technologyAnalyzer from "../services/technology-analyzer.service.js";
 import repositorySummaryService from "../services/repository-summary.service.js";
 import repositoryAIService from "../services/repository-ai.service.js";
 import repositoryIndexService from "../services/repository-index.service.js";
+import repositoryCacheService from "../services/repository-cache.service.js";
 
 export const analyzeRepository = async (
   req: Request,
@@ -25,23 +26,32 @@ export const analyzeRepository = async (
     const snapshot =
       await repositoryProcessor.processRepository(repoUrl);
 
-    const repositoryIndex =
-      await repositoryIndexService.build(
-        snapshot.repositoryPath
-      );
+console.time("index");
 
-    const analysis =
-      await technologyAnalyzer.analyze(
-        snapshot.repositoryPath
-      );
+const repositoryIndex =
+  await repositoryIndexService.build(
+    snapshot.repositoryPath
+  );
 
-    const importantFiles = await repositorySummaryService.collect(
-        snapshot.repositoryPath
-      );
+console.timeEnd("index");
 
-    const repositorySummary = await repositoryAIService.summarize(
-        importantFiles
-      );
+console.time("important-files");
+
+const importantFiles =
+  await repositorySummaryService.collect(
+    snapshot.repositoryPath
+  );
+
+console.timeEnd("important-files");
+
+console.time("summary");
+
+const repositorySummary =
+  await repositoryAIService.summarize(
+    importantFiles
+  );
+
+console.timeEnd("summary");
 
     res.status(200).json({
       success: true,

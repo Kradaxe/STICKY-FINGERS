@@ -6,6 +6,7 @@ import fileRoutes from "./routes/file.routes.js";
 import aiRoutes from "./routes/ai.routes.js";
 import searchRoutes from "./routes/search.routes.js";
 import chatRoutes from "./routes/chat.routes.js";
+import documentationRoutes from "./routes/documentation.routes.js";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use("/api/repositories", fileRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api", searchRoutes);
 app.use("/api", chatRoutes);
+app.use("/api", documentationRoutes);
 app.get("/", (req, res) => {
   res.json({
     message: "CodeForge API Running",

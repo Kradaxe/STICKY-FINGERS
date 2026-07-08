@@ -4,6 +4,7 @@ import repositoryProcessor from "../services/repository.processor.js";
 import repositoryIndexService from "../services/repository-index.service.js";
 import repositorySearchService from "../services/repository-search.service.js";
 import repositoryChatService from "../services/repository-chat.service.js";
+import repositoryCacheService from "../services/repository-cache.service.js";
 
 export const askRepository = async (
   req: Request,
@@ -20,13 +21,18 @@ export const askRepository = async (
       return;
     }
 
-    const snapshot =
-      await repositoryProcessor.processRepository(repoUrl);
+    const cached =
+    repositoryCacheService.get(repoUrl);
+      
+    if (!cached) {
+        res.status(400).json({
+            success:false,
+            message:"Repository must be analyzed first."
+        });
+        return;
+    }
 
-    const index =
-      await repositoryIndexService.build(
-        snapshot.repositoryPath
-      );
+const index = cached.index;
 
     const results =
       repositorySearchService.search(

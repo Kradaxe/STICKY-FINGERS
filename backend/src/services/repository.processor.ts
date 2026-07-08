@@ -29,11 +29,23 @@ class RepositoryProcessor {
     public async processRepository(
       repoUrl: string
     ): Promise<RepositorySnapshot> {
-      const repositoryPath = await this.cloneRepository(repoUrl);
-
+    
+      console.time("clone");
+    
+      const repositoryPath =
+        await this.cloneRepository(repoUrl);
+    
+      console.timeEnd("clone");
+    
+      console.time("structure");
+    
       const structure =
-        await this.buildRepositoryStructure(repositoryPath);
-
+        await this.buildRepositoryStructure(
+          repositoryPath
+        );
+      
+      console.timeEnd("structure");
+      
       return {
         repositoryPath,
         structure
@@ -55,13 +67,23 @@ class RepositoryProcessor {
       repositoryName
     );
 
-    const git = simpleGit();
-    console.log("Starting clone...");
-    await git.clone(repoUrl, clonePath, [
-      "--depth",
-      "1",
-      "--filter=blob:none",
-    ]);
+    try {
+      await fs.access(clonePath);
+    
+      console.log("Repository already exists.");
+      return clonePath;
+    } catch {
+      console.log("Cloning repository...");
+    
+      const git = simpleGit();
+    
+      await git.clone(repoUrl, clonePath, [
+        "--depth",
+        "1",
+      ]);
+    
+      console.log("Clone completed!");
+    }
     console.log("Clone completed!");
 
     return clonePath;
@@ -70,14 +92,14 @@ class RepositoryProcessor {
   /**
    * Generates a unique folder name.
    */
-  private generateRepositoryName(repoUrl: string): string {
-    const repository = repoUrl
+  private generateRepositoryName(
+    repoUrl: string
+  ): string {
+    return repoUrl
       .split("/")
       .slice(-2)
       .join("-")
       .replace(".git", "");
-
-    return `${repository}-${Date.now()}`;
   }
 
   private async buildRepositoryStructure(
