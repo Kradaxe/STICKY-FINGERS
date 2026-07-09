@@ -37,19 +37,19 @@ console.timeEnd("index");
 
 console.time("important-files");
 
-const importantFiles =
-  await repositorySummaryService.collect(
-    snapshot.repositoryPath
-  );
+// const importantFiles =
+//   await repositorySummaryService.collect(
+//     snapshot.repositoryPath
+//   );
 
 console.timeEnd("important-files");
 
 console.time("summary");
 
-const repositorySummary =
-  await repositoryAIService.summarize(
-    importantFiles
-  );
+// const repositorySummary =
+//   await repositoryAIService.summarize(
+//     importantFiles
+//   );
 
 console.timeEnd("summary");
 
@@ -61,8 +61,6 @@ console.timeEnd("summary");
           path: snapshot.repositoryPath,
         },
         structure: snapshot.structure,
-        analysis,
-        summary: repositorySummary,
         index: repositoryIndex,
       },
     });
