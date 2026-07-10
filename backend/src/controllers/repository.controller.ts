@@ -26,16 +26,22 @@ export const analyzeRepository = async (
     const snapshot =
       await repositoryProcessor.processRepository(repoUrl);
 
-console.time("index");
+    console.time("index");
 
-const repositoryIndex =
-  await repositoryIndexService.build(
-    snapshot.repositoryPath
-  );
+    const repositoryIndex =
+      await repositoryIndexService.build(
+        snapshot.repositoryPath
+      );
+    
+    console.timeEnd("index");
 
-console.timeEnd("index");
-
-console.time("important-files");
+    repositoryCacheService.set(
+      repoUrl,
+      snapshot.repositoryPath,
+      repositoryIndex
+    );
+    
+    console.time("important-files");
 
 // const importantFiles =
 //   await repositorySummaryService.collect(

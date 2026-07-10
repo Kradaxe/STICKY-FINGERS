@@ -1,19 +1,23 @@
 import { GoogleGenAI } from "@google/genai";
-import type{ IndexedFile } from "../types/repository-index.js";
+
+import type {
+  RepositoryIndex,
+} from "../types/repository-index.js";
 
 class RepositoryChatService {
   public async ask(
     question: string,
-    files: IndexedFile[]
+    index: RepositoryIndex
   ): Promise<string> {
 
     const client = new GoogleGenAI({
       apiKey: process.env.GEMINI_API_KEY!,
     });
 
-    const context = files
+    const context = index.files
+      .slice(0, 25)
       .map(
-        (file) => `
+        file => `
 FILE: ${file.path}
 
 ${file.content}
@@ -22,20 +26,24 @@ ${file.content}
       .join("\n\n");
 
     const prompt = `
-You are an expert software engineer.
+You are a senior staff engineer.
 
-Answer ONLY using the repository context below.
+Answer questions about this repository.
 
-Repository Context:
+Repository:
 
 ${context}
 
 Question:
+
 ${question}
 
-Respond in Markdown.
+Rules:
 
-If the answer cannot be found, clearly state that.
+- Answer using repository evidence.
+- Mention file names.
+- Be concise.
+- Use markdown.
 `;
 
     const response =
@@ -44,7 +52,8 @@ If the answer cannot be found, clearly state that.
         contents: prompt,
       });
 
-    return response.text ?? "No response generated.";
+    return response.text ??
+      "No answer generated.";
   }
 }
 

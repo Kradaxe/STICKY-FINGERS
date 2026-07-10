@@ -10,7 +10,11 @@ export const generateDocumentation = async (
   try {
     const { repoUrl } = req.body;
 
+    console.log("Documentation request repoUrl:", repoUrl);
+      
     const cached = repositoryCacheService.get(repoUrl);
+      
+    console.log("Cache hit:", !!cached);
 
     if (!cached) {
       res.status(400).json({
