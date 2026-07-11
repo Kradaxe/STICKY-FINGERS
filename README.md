@@ -1,3 +1,5 @@
+(UNDER CONSTRUCTION)
+
 # 🕵️ STICKY-FINGERS
 
 An AI-powered repository intelligence platform that understands GitHub repositories.
