@@ -1,5 +1,7 @@
 (UNDER CONSTRUCTION)
 
+live : https://sticky-fingers-mu.vercel.app/
+
 # 🕵️ STICKY-FINGERS
 
 An AI-powered repository intelligence platform that understands GitHub repositories.
