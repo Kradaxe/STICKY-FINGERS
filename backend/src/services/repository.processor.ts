@@ -9,10 +9,7 @@ import type {
   RepositorySnapshot,
 } from "../types/file-tree.types.js";
 
-import {
-  IGNORED_DIRECTORIES,
-  IGNORED_FILES,
-} from "../utils/file.utils.js";
+import { IGNORED_DIRECTORIES, IGNORED_FILES } from "../utils/file.utils.js";
 
 class RepositoryProcessor {
   private readonly storagePath: string;
@@ -26,31 +23,24 @@ class RepositoryProcessor {
    * Public method that clones a repository and returns
    * the local filesystem path.
    */
-    public async processRepository(
-      repoUrl: string
-    ): Promise<RepositorySnapshot> {
-    
-      console.time("clone");
-    
-      const repositoryPath =
-        await this.cloneRepository(repoUrl);
-    
-      console.timeEnd("clone");
-    
-      console.time("structure");
-    
-      const structure =
-        await this.buildRepositoryStructure(
-          repositoryPath
-        );
-      
-      console.timeEnd("structure");
-      
-      return {
-        repositoryPath,
-        structure
-      };
-    }
+  public async processRepository(repoUrl: string): Promise<RepositorySnapshot> {
+    console.time("clone");
+
+    const repositoryPath = await this.cloneRepository(repoUrl);
+
+    console.timeEnd("clone");
+
+    console.time("structure");
+
+    const structure = await this.buildRepositoryStructure(repositoryPath);
+
+    console.timeEnd("structure");
+
+    return {
+      repositoryPath,
+      structure,
+    };
+  }
 
   /**
    * Clone repository into storage/repositories
@@ -62,26 +52,20 @@ class RepositoryProcessor {
 
     const repositoryName = this.generateRepositoryName(repoUrl);
 
-    const clonePath = path.join(
-      this.storagePath,
-      repositoryName
-    );
+    const clonePath = path.join(this.storagePath, repositoryName);
 
     try {
       await fs.access(clonePath);
-    
+
       console.log("Repository already exists.");
       return clonePath;
     } catch {
       console.log("Cloning repository...");
-    
+
       const git = simpleGit();
-    
-      await git.clone(repoUrl, clonePath, [
-        "--depth",
-        "1",
-      ]);
-    
+
+      await git.clone(repoUrl, clonePath, ["--depth", "1"]);
+
       console.log("Clone completed!");
     }
     console.log("Clone completed!");
@@ -92,109 +76,96 @@ class RepositoryProcessor {
   /**
    * Generates a unique folder name.
    */
-  private generateRepositoryName(
-    repoUrl: string
-  ): string {
-    return repoUrl
-      .split("/")
-      .slice(-2)
-      .join("-")
-      .replace(".git", "");
+  private generateRepositoryName(repoUrl: string): string {
+    return repoUrl.split("/").slice(-2).join("-").replace(".git", "");
   }
 
   private async buildRepositoryStructure(
-    repositoryPath: string
+    repositoryPath: string,
   ): Promise<RepositoryStructure> {
     const statistics: RepositoryStatistics = {
       totalFiles: 0,
       totalDirectories: 0,
-        totalSize: 0,
-        extensions: {},
-      };
-  
-      const tree = await this.scanDirectory(
-        repositoryPath,
-        repositoryPath,
-      statistics
-        );
-    
-        return {
-          tree,
-          statistics,
-        };
-    }
+      totalSize: 0,
+      extensions: {},
+    };
 
-    private async scanDirectory(
-      currentPath: string,
-      rootPath: string,
-      statistics: RepositoryStatistics
-    ): Promise<FileNode[]> {
-      const entries = await fs.readdir(currentPath, {
-        withFileTypes: true,
-      });
+    const tree = await this.scanDirectory(
+      repositoryPath,
+      repositoryPath,
+      statistics,
+    );
 
-      const nodes: FileNode[] = [];
+    return {
+      tree,
+      statistics,
+    };
+  }
 
-      for (const entry of entries) {
-        if (
-          IGNORED_DIRECTORIES.includes(entry.name) ||
-          IGNORED_FILES.includes(entry.name)
-        ) {
-          continue;
-        }
+  private async scanDirectory(
+    currentPath: string,
+    rootPath: string,
+    statistics: RepositoryStatistics,
+  ): Promise<FileNode[]> {
+    const entries = await fs.readdir(currentPath, {
+      withFileTypes: true,
+    });
 
-        const fullPath = path.join(currentPath, entry.name);
+    const nodes: FileNode[] = [];
 
-        const relativePath = path.relative(rootPath, fullPath);
+    for (const entry of entries) {
+      if (
+        IGNORED_DIRECTORIES.includes(entry.name) ||
+        IGNORED_FILES.includes(entry.name)
+      ) {
+        continue;
+      }
 
-        const stat = await fs.stat(fullPath);
+      const fullPath = path.join(currentPath, entry.name);
 
-        if (entry.isDirectory()) {
-          statistics.totalDirectories++;
+      const relativePath = path.relative(rootPath, fullPath);
 
-          nodes.push({
-            name: entry.name,
-            path: relativePath,
-            type: "directory",
-            size: stat.size,
-            children: await this.scanDirectory(
-              fullPath,
-              rootPath,
-              statistics
-            ),
-          });
+      const stat = await fs.stat(fullPath);
 
-          continue;
-        }
-
-        statistics.totalFiles++;
-        statistics.totalSize += stat.size;
-
-        const extension =
-          path.extname(entry.name).replace(".", "") || "unknown";
-
-        statistics.extensions[extension] =
-          (statistics.extensions[extension] || 0) + 1;
+      if (entry.isDirectory()) {
+        statistics.totalDirectories++;
 
         nodes.push({
           name: entry.name,
           path: relativePath,
-          type: "file",
-          extension,
+          type: "directory",
           size: stat.size,
+          children: await this.scanDirectory(fullPath, rootPath, statistics),
         });
+
+        continue;
       }
 
-      return nodes.sort((a, b) => {
-        if (a.type === b.type) {
-          return a.name.localeCompare(b.name);
-        }
+      statistics.totalFiles++;
+      statistics.totalSize += stat.size;
 
-        return a.type === "directory" ? -1 : 1;
+      const extension = path.extname(entry.name).replace(".", "") || "unknown";
+
+      statistics.extensions[extension] =
+        (statistics.extensions[extension] || 0) + 1;
+
+      nodes.push({
+        name: entry.name,
+        path: relativePath,
+        type: "file",
+        extension,
+        size: stat.size,
       });
     }
 
+    return nodes.sort((a, b) => {
+      if (a.type === b.type) {
+        return a.name.localeCompare(b.name);
+      }
 
+      return a.type === "directory" ? -1 : 1;
+    });
+  }
 }
 
 export default new RepositoryProcessor();

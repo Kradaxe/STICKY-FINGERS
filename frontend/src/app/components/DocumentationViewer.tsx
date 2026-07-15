@@ -28,16 +28,16 @@ export default function DocumentationViewer({
   };
 
   return (
-    <div className="mt-10 rounded-xl border bg-white">
-      <div className="flex border-b">
+    <div className="surface mt-10 overflow-hidden rounded-2xl">
+      <div className="flex overflow-x-auto border-b border-white/10">
         {Object.keys(docs).map((key) => (
           <button
             key={key}
             onClick={() => setTab(key as Tab)}
             className={`px-5 py-3 ${
               tab === key
-                ? "border-b-2 border-black font-semibold"
-                : "text-gray-500"
+                ? "border-b-2 border-violet-400 font-semibold text-white"
+                : "text-slate-500 hover:text-slate-200"
             }`}
           >
             {key}
@@ -45,7 +45,7 @@ export default function DocumentationViewer({
         ))}
       </div>
 
-      <div className="prose max-w-none p-8">
+      <div className="prose max-w-none p-6 sm:p-8">
         <ReactMarkdown>
           {docs[tab]}
         </ReactMarkdown>

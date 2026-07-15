@@ -9,7 +9,7 @@ import repositoryCacheService from "../services/repository-cache.service.js";
 
 export const analyzeRepository = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const { repoUrl } = req.body;
@@ -23,41 +23,39 @@ export const analyzeRepository = async (
     }
 
     const repository = await githubService.getRepository(repoUrl);
-    const snapshot =
-      await repositoryProcessor.processRepository(repoUrl);
+    const snapshot = await repositoryProcessor.processRepository(repoUrl);
 
     console.time("index");
 
-    const repositoryIndex =
-      await repositoryIndexService.build(
-        snapshot.repositoryPath
-      );
-    
+    const repositoryIndex = await repositoryIndexService.build(
+      snapshot.repositoryPath,
+    );
+
     console.timeEnd("index");
 
     repositoryCacheService.set(
       repoUrl,
       snapshot.repositoryPath,
-      repositoryIndex
+      repositoryIndex,
     );
-    
+
     console.time("important-files");
 
-// const importantFiles =
-//   await repositorySummaryService.collect(
-//     snapshot.repositoryPath
-//   );
+    // const importantFiles =
+    //   await repositorySummaryService.collect(
+    //     snapshot.repositoryPath
+    //   );
 
-console.timeEnd("important-files");
+    console.timeEnd("important-files");
 
-console.time("summary");
+    console.time("summary");
 
-// const repositorySummary =
-//   await repositoryAIService.summarize(
-//     importantFiles
-//   );
+    // const repositorySummary =
+    //   await repositoryAIService.summarize(
+    //     importantFiles
+    //   );
 
-console.timeEnd("summary");
+    console.timeEnd("summary");
 
     res.status(200).json({
       success: true,

@@ -15,7 +15,7 @@ const List = ({ title, items }: { title: string; items: string[] }) => {
         {items.map((item) => (
           <span
             key={item}
-            className="rounded-full bg-gray-100 px-3 py-1 text-sm"
+            className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-300"
           >
             {item}
           </span>
@@ -27,8 +27,8 @@ const List = ({ title, items }: { title: string; items: string[] }) => {
 
 export default function TechnologyCard({ analysis }: Props) {
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm space-y-6">
-      <h2 className="text-2xl font-bold">
+    <div className="surface space-y-6 rounded-2xl p-6 sm:p-8">
+      <h2 className="text-2xl font-bold text-white">
         Technology Stack
       </h2>
 

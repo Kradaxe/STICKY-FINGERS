@@ -38,7 +38,6 @@ export default function Home() {
   const [loadingAnswer, setLoadingAnswer] = useState(false);
   const [activeTab, setActiveTab] = useState<
   "overview" |
-  "explorer" |
   "docs" |
   "chat"
 >("overview");
@@ -94,25 +93,25 @@ const [loadingDocs, setLoadingDocs] = useState(false);
   };
 
   return (
-    <main className="mx-auto max-w-7xl p-8">
-      <h1 className="mb-8 text-4xl font-bold">
-        STICKY-FINGERS
-      </h1>
-
-      <RepositoryForm
-        onAnalyze={analyze}
-      />
+    <main className="relative min-h-screen overflow-hidden px-5 pb-16 pt-6 sm:px-8">
+      <div className="grid-glow pointer-events-none absolute inset-x-0 top-0 h-[620px]" />
+      <div className="relative mx-auto max-w-7xl">
+        <nav className="mb-20 flex items-center justify-between">
+          <div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-violet-400 to-indigo-600 text-xl font-black text-white shadow-lg shadow-violet-500/20">S</div><span className="font-bold tracking-tight text-white">STICKY<span className="text-violet-400">-</span>FINGERS</span></div>
+          <div className="hidden items-center gap-2 text-xs font-medium text-slate-400 sm:flex"><span className="h-2 w-2 rounded-full bg-emerald-400" /> SYSTEM ONLINE</div>
+        </nav>
+        {!result && <section className="mb-16 text-center"><p className="mb-5 text-xs font-bold uppercase tracking-[.28em] text-violet-300">Repository intelligence, instantly</p><h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-[-.055em] text-white sm:text-7xl">See the architecture <span className="bg-gradient-to-r from-violet-300 to-cyan-300 bg-clip-text text-transparent">behind the code.</span></h1><p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-slate-400">Turn any GitHub repository into an interactive, AI-assisted workspace. Explore, understand, and document codebases in seconds.</p></section>}
+        <RepositoryForm onAnalyze={analyze} />
 
       {result && (
-        <div className="mt-10">
+        <div className="mt-14">
           <RepositoryCard
             repository={result.repository}
           />
 
-          <div className="mt-6 flex gap-2">
+          <div className="mt-6 flex gap-2 overflow-x-auto rounded-2xl border border-white/8 bg-white/[.035] p-1.5">
             {[
               "overview",
-              "explorer",
               "docs",
               "chat",
             ].map((tab) => (
@@ -122,15 +121,14 @@ const [loadingDocs, setLoadingDocs] = useState(false);
                   setActiveTab(
                     tab as
                       | "overview"
-                      | "explorer"
                       | "docs"
                       | "chat"
                   )
                 }
-                className={`rounded-lg px-5 py-3 capitalize ${
+                className={`rounded-xl px-5 py-3 text-sm font-semibold capitalize transition ${
                   activeTab === tab
-                    ? "bg-black text-white"
-                    : "border bg-white"
+                    ? "bg-violet-500 text-white shadow-lg shadow-violet-900/40"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
                 }`}
               >
                 {tab}
@@ -140,27 +138,6 @@ const [loadingDocs, setLoadingDocs] = useState(false);
 
           {activeTab === "overview" && (
             <>
-              <button
-                onClick={async () => {
-                  if (!result) return;
-
-                  setLoadingDocs(true);
-
-                  const docs = await generateDocumentation(
-                    repoUrl
-                  );
-
-                  setDocumentation(docs.data);
-
-                  setLoadingDocs(false);
-                }}
-                className="mt-6 rounded-lg bg-black px-5 py-3 text-white"
-              >
-                {loadingDocs
-                  ? "Generating..."
-                  : "Generate Documentation"}
-              </button>
-
               <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
                 <StatsCard
                   title="Files"
@@ -202,55 +179,19 @@ const [loadingDocs, setLoadingDocs] = useState(false);
                   summary={result.summary}
                 />
               </div>
+
+              <section className="mt-8">
+                <div className="mb-4 flex items-end justify-between gap-4">
+                  <div><p className="text-xs font-bold uppercase tracking-[.2em] text-violet-300">Repository structure</p><h2 className="mt-1 text-2xl font-bold text-white">Explore the codebase</h2></div>
+                  <span className="hidden text-sm text-slate-500 sm:block">Select any file to inspect it live</span>
+                </div>
+                <div className="grid gap-6 lg:grid-cols-3">
+                  <div className="surface h-[580px] overflow-auto rounded-2xl p-5"><div className="mb-4 flex items-center justify-between"><h3 className="font-semibold text-white">File map</h3><span className="rounded-full bg-white/5 px-2 py-1 text-xs text-slate-400">{result.structure.statistics.totalFiles} files</span></div><FileTree nodes={result.structure.tree} onSelect={openFile} /></div>
+                  <div className="lg:col-span-2"><div className="mb-4 flex items-center justify-between gap-3"><h3 className="truncate font-mono text-sm font-semibold text-slate-200">{selectedFile || "Select a file from the map"}</h3><button onClick={explainSelectedFile} disabled={!selectedFile || loadingAI} className="shrink-0 rounded-xl bg-violet-500 px-4 py-2 text-sm font-bold text-white disabled:opacity-40">{loadingAI ? "Thinking..." : "✨ Explain file"}</button></div><div className="h-[580px] overflow-hidden rounded-2xl border border-white/10 bg-[#111522]"><FileViewer content={fileContent || "// Choose a file from the repository map to inspect its source code."} language={extension || "typescript"} /></div></div>
+                </div>
+                {explanation && <div className="mt-6"><MarkdownViewer markdown={explanation} /></div>}
+              </section>
             </>
-          )}
-
-          {activeTab === "explorer" && (
-            <div className="mt-10 grid grid-cols-3 gap-6">
-              <div className="rounded-xl border p-6 overflow-auto h-[700px]">
-                <h2 className="mb-4 text-xl font-bold">
-                  Repository Explorer
-                </h2>
-
-                <FileTree
-                  nodes={result.structure.tree}
-                  onSelect={openFile}
-                />
-              </div>
-
-              <div className="col-span-2">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-xl font-bold">
-                    {selectedFile || "Select a file"}
-                  </h2>
-
-                  <button
-                    onClick={explainSelectedFile}
-                    disabled={loadingAI}
-                    className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-50"
-                  >
-                    {loadingAI
-                      ? "Thinking..."
-                      : "✨ Explain File"}
-                  </button>
-                </div>
-
-                <div className="col-span-2 h-[700px] overflow-hidden rounded-xl border">
-                  <FileViewer
-                    content={fileContent}
-                    language={extension}
-                  />
-                </div>
-
-                {explanation && (
-                  <div className="mt-8">
-                    <MarkdownViewer
-                      markdown={explanation}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
           )}
 
           {activeTab === "docs" && (
@@ -263,16 +204,34 @@ const [loadingDocs, setLoadingDocs] = useState(false);
                   api={documentation.api}
                 />
               ) : (
-                <div className="rounded-xl border p-8 text-center text-gray-500">
-                  Click "Generate Documentation" to view docs
+                <div className="surface rounded-2xl p-12 text-center">
+                  <p className="text-xs font-bold uppercase tracking-[.2em] text-violet-300">Documentation studio</p>
+                  <h2 className="mt-3 text-3xl font-bold text-white">Turn the codebase into clear docs.</h2>
+                  <p className="mx-auto mt-3 max-w-lg text-slate-400">Generate a README, setup instructions, architecture notes, and API documentation based on this repository.</p>
+                  <button
+                    onClick={async () => {
+                      if (!result) return;
+                      setLoadingDocs(true);
+                      try {
+                        const docs = await generateDocumentation(repoUrl);
+                        setDocumentation(docs.data);
+                      } finally {
+                        setLoadingDocs(false);
+                      }
+                    }}
+                    disabled={loadingDocs}
+                    className="mt-7 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-500 px-6 py-3 text-sm font-bold text-white transition hover:scale-[1.02] disabled:opacity-50"
+                  >
+                    {loadingDocs ? "Generating documentation..." : "Generate documentation →"}
+                  </button>
                 </div>
               )}
             </div>
           )}
 
           {activeTab === "chat" && (
-            <div className="mt-10 rounded-xl border p-6">
-              <h2 className="text-2xl font-bold mb-4">
+            <div className="surface mt-10 rounded-2xl p-6 sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-violet-300">AI repository assistant</p><h2 className="mb-5 mt-2 text-2xl font-bold text-white">
                 Ask This Repository
               </h2>
 
@@ -281,7 +240,7 @@ const [loadingDocs, setLoadingDocs] = useState(false);
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Where is authentication implemented?"
-                  className="flex-1 rounded-lg border px-4 py-3"
+                  className="flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white outline-none placeholder:text-slate-500 focus:border-violet-400"
                 />
 
                 <button
@@ -300,14 +259,14 @@ const [loadingDocs, setLoadingDocs] = useState(false);
 
                     setLoadingAnswer(false);
                   }}
-                  className="rounded-lg bg-black px-5 py-3 text-white"
+                  className="rounded-xl bg-violet-500 px-5 py-3 font-bold text-white"
                 >
                   {loadingAnswer ? "Thinking..." : "Ask"}
                 </button>
               </div>
 
               {answer && (
-                <div className="mt-6 rounded-lg border p-4 whitespace-pre-wrap">
+                <div className="mt-6 whitespace-pre-wrap rounded-xl border border-white/10 bg-black/20 p-5 text-slate-300">
                   {answer}
                 </div>
               )}
@@ -315,6 +274,6 @@ const [loadingDocs, setLoadingDocs] = useState(false);
           )}
         </div>
       )}
-    </main>
+      </div></main>
   );
 }

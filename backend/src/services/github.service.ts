@@ -11,7 +11,7 @@ class GithubService {
   private readonly api: AxiosInstance;
 
   constructor() {
-    this.api = axios.create({ 
+    this.api = axios.create({
       baseURL: "https://api.github.com",
       headers: {
         Accept: "application/vnd.github+json",
@@ -26,8 +26,7 @@ class GithubService {
    * Validates whether a URL is a valid GitHub repository URL.
    */
   public validateRepositoryUrl(url: string): boolean {
-    const regex =
-      /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/;
+    const regex = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/;
 
     return regex.test(url);
   }
@@ -43,8 +42,7 @@ class GithubService {
       throw new Error("Invalid GitHub repository URL.");
     }
 
-    const regex =
-      /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/;
+    const regex = /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/;
 
     const match = url.match(regex);
 
@@ -66,7 +64,7 @@ class GithubService {
       const { owner, repo } = this.extractRepositoryInfo(repoUrl);
 
       const { data } = await this.api.get<GitHubRepositoryResponse>(
-        `/repos/${owner}/${repo}`
+        `/repos/${owner}/${repo}`,
       );
 
       return this.mapRepository(data);
@@ -88,9 +86,7 @@ class GithubService {
   /**
    * Converts GitHub's response into our internal Repository model.
    */
-  private mapRepository(
-    githubRepo: GitHubRepositoryResponse
-  ): Repository {
+  private mapRepository(githubRepo: GitHubRepositoryResponse): Repository {
     return {
       id: githubRepo.id,
       name: githubRepo.name,

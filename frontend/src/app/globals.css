@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f7f4;
+  --foreground: #17213a;
 }
 
 @theme inline {
@@ -12,15 +12,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background: #f8f7f4;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+* { box-sizing: border-box; }
+::selection { background: #d9e3fa; color: #17213a; }
+.grid-glow { display: none; }
+.surface { border: 1px solid #e5e6eb; background: #fff; box-shadow: 0 8px 24px rgba(23, 33, 58, .055); }
+.prose { color: #566074; }.prose h1, .prose h2, .prose h3, .prose strong { color: #17213a; }.prose code { color: #315bc7; }
+
+/* Calm, editorial theme overrides for the original utility palette. */
+.text-white { color: #17213a !important; }
+.text-slate-500 { color: #7c8495 !important; }.text-slate-400 { color: #697387 !important; }.text-slate-300 { color: #566074 !important; }.text-slate-200 { color: #3c465b !important; }
+.text-violet-300, .text-violet-200, .text-violet-400 { color: #315bc7 !important; }
+.bg-violet-500 { background: #315bc7 !important; }.bg-violet-500\/10, .bg-violet-500\/15 { background: #edf1fc !important; }
+.border-violet-400\/20, .border-violet-300\/20, .border-violet-300\/15 { border-color: #d5dff7 !important; }
+.bg-white\/5, .bg-white\/\[\.035\] { background: #f3f4f7 !important; }.border-white\/10, .border-white\/8 { border-color: #e5e6eb !important; }
+.bg-black\/20 { background: #f8f9fc !important; }.bg-\[\#111522\], .bg-\[\#111522\]\/90 { background: #fff !important; }
+.bg-gradient-to-r, .bg-gradient-to-br { background-image: none !important; background-color: #315bc7 !important; }

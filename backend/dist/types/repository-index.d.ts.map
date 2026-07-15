@@ -1,0 +1,1 @@
+{"version":3,"file":"repository-index.d.ts","sourceRoot":"","sources":["../../src/types/repository-index.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,WAAW;IAC1B,IAAI,EAAE,MAAM,CAAC;IACb,SAAS,EAAE,MAAM,CAAC;IAClB,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,EAAE,MAAM,CAAC;CACjB;AAED,MAAM,WAAW,eAAe;IAC9B,KAAK,EAAE,WAAW,EAAE,CAAC;CACtB"}

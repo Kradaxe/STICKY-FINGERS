@@ -5,10 +5,9 @@ interface Props {
 
 export default function StatsCard({ title, value }: Props) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <p className="text-sm text-gray-500">{title}</p>
-
-      <h3 className="mt-2 text-2xl font-bold">{value}</h3>
+    <div className="surface rounded-2xl p-5 transition hover:-translate-y-1 hover:border-violet-400/40">
+      <p className="text-xs font-medium uppercase tracking-[.16em] text-slate-500">{title}</p>
+      <h3 className="mt-2 text-3xl font-bold tracking-tight text-white">{value}</h3>
     </div>
   );
 }
