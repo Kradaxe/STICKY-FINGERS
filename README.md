@@ -1,4 +1,6 @@
-(UNDER CONSTRUCTION)
+<img width="1920" height="885" alt="Screenshot (77)" src="https://github.com/user-attachments/assets/1cf26834-0a8e-4911-b0f2-a0f056ff60a9" />
+
+<img width="1920" height="882" alt="Screenshot (76)" src="https://github.com/user-attachments/assets/21b39762-427d-4ec4-8a39-8028cde8f13d" />
 
 live : https://sticky-fingers-mu.vercel.app/
 
@@ -14,6 +16,9 @@ Paste a GitHub repository URL and STICKY-FINGERS will clone, analyze, index and 
 
 ### Repository Analysis
 
+<img width="1895" height="883" alt="Screenshot (78)" src="https://github.com/user-attachments/assets/e740761d-f6b7-4a5b-9fcc-eba8d916783b" />
+
+
 * Clone public GitHub repositories on demand
 * Parse and visualize repository structure
 * Detect technologies and frameworks automatically
@@ -21,12 +26,18 @@ Paste a GitHub repository URL and STICKY-FINGERS will clone, analyze, index and 
 
 ### AI-Powered Understanding
 
+![Uploading Screenshot (79).png…]()
+
+
 * Generate high-level repository summaries
 * Explain individual source files in natural language
 * Answer questions about the codebase using repository context
 * Generate project documentation automatically
 
 ### Documentation Generation
+
+<img width="1920" height="889" alt="Screenshot (81)" src="https://github.com/user-attachments/assets/78a662d3-2ba0-48d1-9744-f63183926afa" />
+
 
 Generate:
 
@@ -46,11 +57,10 @@ Generate:
 
 ## Demo
 
-### Live Demo
-
-Coming Soon
-
 ### Example Questions
+
+<img width="1920" height="886" alt="Screenshot (85)" src="https://github.com/user-attachments/assets/d0a4a0d1-024b-46fb-9eef-3aed1c6f4b8a" />
+
 
 * Where is authentication implemented?
 * How does the API layer work?
