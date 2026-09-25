@@ -2,7 +2,7 @@
 
 <img width="1920" height="882" alt="Screenshot (76)" src="https://github.com/user-attachments/assets/21b39762-427d-4ec4-8a39-8028cde8f13d" />
 
-live : https://sticky-fingers-mu.vercel.app/
+live at : https://sticky-fingers-mu.vercel.app/
 
 # 🕵️ STICKY-FINGERS
 
